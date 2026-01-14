@@ -24,6 +24,9 @@ const Index = () => {
   ]);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [isVideoCalling, setIsVideoCalling] = useState(false);
+  const [callDuration, setCallDuration] = useState(0);
+  const [isIncomingCall, setIsIncomingCall] = useState(false);
 
   const mockChats = [
     { id: 1, name: 'Анна Иванова', lastMessage: 'Привет! Как дела?', time: '14:32', unread: 3, avatar: 'AI', online: true },
@@ -520,10 +523,20 @@ const Index = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2">
-                <Button size="sm" variant="ghost" className="neon-border-blue hover:neon-glow-blue">
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  className="neon-border-blue hover:neon-glow-blue"
+                  onClick={() => setIsIncomingCall(true)}
+                >
                   <Icon name="Phone" size={18} />
                 </Button>
-                <Button size="sm" variant="ghost" className="neon-border-orange hover:neon-glow-orange">
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  className="neon-border-orange hover:neon-glow-orange"
+                  onClick={() => setIsVideoCalling(true)}
+                >
                   <Icon name="Video" size={18} />
                 </Button>
                 <Button size="sm" variant="ghost">
@@ -661,6 +674,144 @@ const Index = () => {
           </div>
         )}
       </div>
+
+      {isVideoCalling && (
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center animate-fade-in">
+          <div className="w-full h-full max-w-6xl max-h-4xl p-6 flex flex-col">
+            <div className="flex-1 relative rounded-2xl overflow-hidden neon-border-red">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 flex items-center justify-center">
+                <div className="text-center space-y-6">
+                  <Avatar className="w-32 h-32 mx-auto neon-glow-blue animate-pulse">
+                    <AvatarFallback className="text-4xl bg-gradient-to-br from-primary to-secondary">
+                      {mockChats.find(c => c.id === selectedChat)?.avatar}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h2 className="text-3xl font-bold mb-2">{mockChats.find(c => c.id === selectedChat)?.name}</h2>
+                    <p className="text-xl text-muted-foreground flex items-center justify-center space-x-2">
+                      <Icon name="Video" size={20} className="animate-pulse" />
+                      <span>{Math.floor(callDuration / 60)}:{(callDuration % 60).toString().padStart(2, '0')}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="absolute top-6 right-6 w-48 h-36 rounded-xl overflow-hidden neon-border-blue">
+                <div className="w-full h-full bg-gradient-to-br from-secondary/40 to-accent/40 flex items-center justify-center">
+                  <Avatar className="w-20 h-20 neon-glow-orange">
+                    <AvatarFallback className="text-2xl bg-gradient-to-br from-accent to-primary">
+                      ВЫ
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center space-x-6 mt-6">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="rounded-full w-16 h-16 neon-border-blue hover:neon-glow-blue"
+              >
+                <Icon name="Mic" size={24} />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="rounded-full w-16 h-16 neon-border-orange hover:neon-glow-orange"
+              >
+                <Icon name="Video" size={24} />
+              </Button>
+              <Button 
+                size="lg" 
+                className="rounded-full w-20 h-20 neon-glow-red bg-primary hover:bg-primary/90"
+                onClick={() => {
+                  setIsVideoCalling(false);
+                  setCallDuration(0);
+                }}
+              >
+                <Icon name="PhoneOff" size={28} />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="rounded-full w-16 h-16 neon-border-blue hover:neon-glow-blue"
+              >
+                <Icon name="Settings" size={24} />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="rounded-full w-16 h-16 neon-border-orange hover:neon-glow-orange"
+              >
+                <Icon name="ScreenShare" size={24} />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isIncomingCall && (
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center animate-fade-in">
+          <Card className="p-8 neon-border-red max-w-md w-full text-center space-y-6">
+            <div className="space-y-4">
+              <Avatar className="w-32 h-32 mx-auto neon-glow-blue animate-pulse">
+                <AvatarFallback className="text-4xl bg-gradient-to-br from-primary via-secondary to-accent">
+                  {mockChats.find(c => c.id === selectedChat)?.avatar}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="text-2xl font-bold mb-2">{mockChats.find(c => c.id === selectedChat)?.name}</h2>
+                <p className="text-muted-foreground flex items-center justify-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse neon-glow-blue"></div>
+                  <span>Входящий звонок...</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center space-x-4 pt-4">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="rounded-full w-16 h-16 neon-border-red hover:neon-glow-red"
+                onClick={() => setIsIncomingCall(false)}
+              >
+                <Icon name="PhoneOff" size={24} />
+              </Button>
+              <Button 
+                size="lg" 
+                className="rounded-full w-20 h-20 neon-glow-blue bg-secondary hover:bg-secondary/90"
+                onClick={() => {
+                  setIsIncomingCall(false);
+                  setIsVideoCalling(true);
+                  const interval = setInterval(() => {
+                    setCallDuration(prev => prev + 1);
+                  }, 1000);
+                }}
+              >
+                <Icon name="Phone" size={28} />
+              </Button>
+              <Button 
+                size="lg" 
+                className="rounded-full w-20 h-20 neon-glow-orange bg-accent hover:bg-accent/90"
+                onClick={() => {
+                  setIsIncomingCall(false);
+                  setIsVideoCalling(true);
+                  const interval = setInterval(() => {
+                    setCallDuration(prev => prev + 1);
+                  }, 1000);
+                }}
+              >
+                <Icon name="Video" size={28} />
+              </Button>
+            </div>
+
+            <p className="text-xs text-muted-foreground pt-2">
+              Нажмите <Icon name="Phone" size={12} className="inline" /> для голосового или <Icon name="Video" size={12} className="inline" /> для видеозвонка
+            </p>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
