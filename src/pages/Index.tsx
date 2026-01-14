@@ -16,6 +16,14 @@ const Index = () => {
   const [authMode, setAuthMode] = useState<'email' | 'phone'>('email');
   const [activeTab, setActiveTab] = useState('chats');
   const [selectedChat, setSelectedChat] = useState<number | null>(null);
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState([
+    { id: 1, sender: 'other', text: 'Привет! Как дела?', time: '14:30' },
+    { id: 2, sender: 'me', text: 'Отлично! А у тебя?', time: '14:31' },
+    { id: 3, sender: 'other', text: 'Тоже всё хорошо! Попробовал новый ZELTEK?', time: '14:32' },
+  ]);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
 
   const mockChats = [
     { id: 1, name: 'Анна Иванова', lastMessage: 'Привет! Как дела?', time: '14:32', unread: 3, avatar: 'AI', online: true },
@@ -128,6 +136,7 @@ const Index = () => {
         </div>
 
         {[
+          { icon: 'Bot', tab: 'support', color: 'red' },
           { icon: 'MessageSquare', tab: 'chats', color: 'red' },
           { icon: 'Users', tab: 'contacts', color: 'blue' },
           { icon: 'Radio', tab: 'channels', color: 'orange' },
@@ -165,6 +174,7 @@ const Index = () => {
               {activeTab === 'groups' && 'Группы'}
               {activeTab === 'profile' && 'Профиль'}
               {activeTab === 'settings' && 'Настройки'}
+              {activeTab === 'support' && 'Поддержка'}
             </h2>
             
             {(activeTab === 'channels' || activeTab === 'groups') && (
@@ -347,10 +357,89 @@ const Index = () => {
 
               <div className="space-y-4">
                 <h3 className="font-semibold text-accent">Боты</h3>
-                <Button className="w-full neon-glow-orange bg-accent">
-                  <Icon name="Bot" size={16} className="mr-2" />
-                  Создать своего бота
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="w-full neon-glow-orange bg-accent">
+                      <Icon name="Bot" size={16} className="mr-2" />
+                      Создать своего бота
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="neon-border-orange max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl flex items-center">
+                        <Icon name="Bot" size={24} className="mr-2" />
+                        Создание бота ZELTEK
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <Label>Имя бота</Label>
+                        <Input placeholder="Мой первый бот" className="neon-border-blue" />
+                      </div>
+                      <div>
+                        <Label>Username</Label>
+                        <Input placeholder="@mybot" className="neon-border-orange" />
+                      </div>
+                      <div>
+                        <Label>Описание</Label>
+                        <Textarea placeholder="Что умеет ваш бот?" className="neon-border-red" rows={3} />
+                      </div>
+                      
+                      <div className="border-t border-border pt-4">
+                        <h4 className="font-semibold mb-3">Возможности бота</h4>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                            <div>
+                              <Label>Автоответы</Label>
+                              <p className="text-xs text-muted-foreground">Отвечать на сообщения автоматически</p>
+                            </div>
+                            <Switch />
+                          </div>
+                          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                            <div>
+                              <Label>Модерация</Label>
+                              <p className="text-xs text-muted-foreground">Управление сообщениями в группах</p>
+                            </div>
+                            <Switch />
+                          </div>
+                          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                            <div>
+                              <Label>Команды</Label>
+                              <p className="text-xs text-muted-foreground">Обработка /команд пользователей</p>
+                            </div>
+                            <Switch defaultChecked />
+                          </div>
+                          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                            <div>
+                              <Label>Webhook API</Label>
+                              <p className="text-xs text-muted-foreground">Интеграция с внешними сервисами</p>
+                            </div>
+                            <Switch />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="border-t border-border pt-4">
+                        <Label>API Token (будет сгенерирован)</Label>
+                        <div className="flex items-center space-x-2 mt-2">
+                          <Input 
+                            value="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz" 
+                            readOnly 
+                            className="font-mono text-sm neon-border-blue"
+                          />
+                          <Button size="sm" variant="outline" className="neon-border-orange">
+                            <Icon name="Copy" size={16} />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <Button className="w-full neon-glow-red bg-primary">
+                        <Icon name="Rocket" size={16} className="mr-2" />
+                        Создать бота
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           )}
@@ -364,6 +453,52 @@ const Index = () => {
               <div className="text-center text-muted-foreground text-sm">
                 Контакты появятся здесь
               </div>
+            </div>
+          )}
+
+          {activeTab === 'support' && (
+            <div className="p-6 space-y-4">
+              <div className="flex items-center space-x-3 mb-6">
+                <Avatar className="neon-glow-red">
+                  <AvatarFallback className="bg-gradient-to-br from-primary to-accent">
+                    <Icon name="Bot" size={24} />
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="font-semibold">Бот поддержки ZELTEK</h3>
+                  <p className="text-xs text-muted-foreground flex items-center">
+                    <span className="w-2 h-2 bg-green-500 rounded-full mr-1 neon-glow-blue"></span>
+                    Всегда онлайн
+                  </p>
+                </div>
+              </div>
+              
+              <Card className="p-4 neon-border-blue">
+                <h4 className="font-semibold mb-3">Чем могу помочь?</h4>
+                <div className="space-y-2">
+                  <Button variant="outline" className="w-full justify-start hover:neon-glow-blue">
+                    <Icon name="HelpCircle" size={16} className="mr-2" />
+                    Как создать канал?
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start hover:neon-glow-orange">
+                    <Icon name="Lock" size={16} className="mr-2" />
+                    Настройка 2FA
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start hover:neon-glow-red">
+                    <Icon name="Users" size={16} className="mr-2" />
+                    Управление группами
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start hover:neon-glow-blue">
+                    <Icon name="Bot" size={16} className="mr-2" />
+                    Создание ботов
+                  </Button>
+                </div>
+              </Card>
+
+              <Button className="w-full neon-glow-red bg-primary">
+                <Icon name="MessageSquare" size={16} className="mr-2" />
+                Написать в поддержку
+              </Button>
             </div>
           )}
         </div>
@@ -398,45 +533,121 @@ const Index = () => {
             </div>
 
             <div className="flex-1 p-6 space-y-4 overflow-y-auto">
-              <div className="flex justify-start">
-                <div className="bg-card p-3 rounded-2xl rounded-tl-none max-w-md neon-border-blue">
-                  <p>Привет! Как дела?</p>
-                  <span className="text-xs text-muted-foreground">14:30</span>
+              {messages.map((msg) => (
+                <div key={msg.id} className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
+                  <div className={`p-3 rounded-2xl max-w-md transition-all transform hover:scale-105 ${
+                    msg.sender === 'me' 
+                      ? 'bg-primary rounded-tr-none neon-glow-red' 
+                      : 'bg-card rounded-tl-none neon-border-blue'
+                  }`}>
+                    <p>{msg.text}</p>
+                    <span className={`text-xs ${msg.sender === 'me' ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+                      {msg.time}
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div className="flex justify-end">
-                <div className="bg-primary p-3 rounded-2xl rounded-tr-none max-w-md neon-glow-red">
-                  <p>Отлично! А у тебя?</p>
-                  <span className="text-xs text-primary-foreground/70">14:31</span>
-                </div>
-              </div>
-              <div className="flex justify-start">
-                <div className="bg-card p-3 rounded-2xl rounded-tl-none max-w-md neon-border-orange">
-                  <p>Тоже всё хорошо! Попробовал новый ZELTEK?</p>
-                  <span className="text-xs text-muted-foreground">14:32</span>
-                </div>
-              </div>
+              ))}
             </div>
 
             <div className="p-4 border-t border-border bg-card">
-              <div className="flex items-center space-x-2">
-                <Button size="sm" variant="ghost" className="hover:neon-glow-blue">
-                  <Icon name="Paperclip" size={18} />
-                </Button>
-                <Button size="sm" variant="ghost" className="hover:neon-glow-orange">
-                  <Icon name="Smile" size={18} />
-                </Button>
-                <Input 
-                  placeholder="Сообщение..." 
-                  className="flex-1 neon-border-blue focus:neon-glow-blue transition-all"
-                />
-                <Button size="sm" variant="ghost" className="hover:neon-glow-red">
-                  <Icon name="Mic" size={18} />
-                </Button>
-                <Button size="sm" className="neon-glow-red bg-primary">
-                  <Icon name="Send" size={18} />
-                </Button>
-              </div>
+              {isRecording ? (
+                <div className="flex items-center space-x-3 p-3 neon-border-red rounded-lg animate-pulse">
+                  <div className="flex items-center space-x-2 flex-1">
+                    <div className="w-3 h-3 bg-primary rounded-full neon-glow-red animate-pulse"></div>
+                    <span className="text-sm font-mono">{Math.floor(recordingTime / 60)}:{(recordingTime % 60).toString().padStart(2, '0')} / 5:00</span>
+                    <div className="flex-1 flex items-center space-x-1">
+                      {[...Array(20)].map((_, i) => (
+                        <div key={i} className="w-1 bg-primary rounded-full animate-pulse" style={{ height: `${Math.random() * 20 + 10}px` }}></div>
+                      ))}
+                    </div>
+                  </div>
+                  <Button size="sm" variant="ghost" onClick={() => { setIsRecording(false); setRecordingTime(0); }}>
+                    <Icon name="Trash2" size={18} />
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="neon-glow-red bg-primary"
+                    onClick={() => {
+                      setIsRecording(false);
+                      setRecordingTime(0);
+                      const newMsg = {
+                        id: messages.length + 1,
+                        sender: 'me' as const,
+                        text: `🎤 Голосовое сообщение (${Math.floor(recordingTime / 60)}:${(recordingTime % 60).toString().padStart(2, '0')})`,
+                        time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+                      };
+                      setMessages([...messages, newMsg]);
+                    }}
+                  >
+                    <Icon name="Send" size={18} />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <Button size="sm" variant="ghost" className="hover:neon-glow-blue">
+                    <Icon name="Paperclip" size={18} />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="hover:neon-glow-orange">
+                    <Icon name="Smile" size={18} />
+                  </Button>
+                  <Input 
+                    placeholder="Сообщение..." 
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && message.trim()) {
+                        const newMsg = {
+                          id: messages.length + 1,
+                          sender: 'me' as const,
+                          text: message,
+                          time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+                        };
+                        setMessages([...messages, newMsg]);
+                        setMessage('');
+                      }
+                    }}
+                    className="flex-1 neon-border-blue focus:neon-glow-blue transition-all"
+                  />
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="hover:neon-glow-red"
+                    onClick={() => {
+                      setIsRecording(true);
+                      const interval = setInterval(() => {
+                        setRecordingTime(prev => {
+                          if (prev >= 300) {
+                            clearInterval(interval);
+                            setIsRecording(false);
+                            return 0;
+                          }
+                          return prev + 1;
+                        });
+                      }, 1000);
+                    }}
+                  >
+                    <Icon name="Mic" size={18} />
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="neon-glow-red bg-primary"
+                    onClick={() => {
+                      if (message.trim()) {
+                        const newMsg = {
+                          id: messages.length + 1,
+                          sender: 'me' as const,
+                          text: message,
+                          time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+                        };
+                        setMessages([...messages, newMsg]);
+                        setMessage('');
+                      }
+                    }}
+                  >
+                    <Icon name="Send" size={18} />
+                  </Button>
+                </div>
+              )}
             </div>
           </>
         ) : (
